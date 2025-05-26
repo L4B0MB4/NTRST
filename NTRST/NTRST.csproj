@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>7e920ca4-76f6-4319-91d8-afaf9c644d9a</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3"/>
+        <PackageReference Include="Scalar.AspNetCore" Version="2.4.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\NTRST.Models\NTRST.Models.csproj"/>
+        <ProjectReference Include="..\NTRST.Spotify\NTRST.Spotify.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -36,6 +36,7 @@ public class UserService(ILogger<UserService> logger, AuthenticationClient spoti
             authDbContext.Add(user);
             await authDbContext.SaveChangesAsync();
         }
-        
+
+        var res = await spotifyAuthClient.GetRecentlyPlayed();
     }
 }

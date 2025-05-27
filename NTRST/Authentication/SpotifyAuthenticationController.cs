@@ -11,8 +11,8 @@ namespace NTRST.Authentication;
 
 [ApiController]
 [Route("/authentication/spotify")]
-public class SpotifyAuthentication(
-    ILogger<SpotifyAuthentication> logger,
+public class SpotifyAuthenticationController(
+    ILogger<SpotifyAuthenticationController> logger,
     IOptions<SsoConfiguration> ssoConfigOption,
     UserService userService) : ControllerBase
 {

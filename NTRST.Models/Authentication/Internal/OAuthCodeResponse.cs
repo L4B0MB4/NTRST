@@ -1,6 +1,6 @@
-namespace NTRST.Models.SSO;
+namespace NTRST.Models.Authentication.Internal;
 
-public class ResponseCodeAuth
+public class OAuthCodeResponse
 {
     public string? Code { get; set; }
     public string? State { get; set; }

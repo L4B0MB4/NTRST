@@ -3,17 +3,32 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NTRST.Models;
+using NTRST.Models.Authentication;
+using NTRST.Models.Authentication.Internal;
 using NTRST.Models.Config;
-using NTRST.Models.SSO;
+using NTRST.Spotify.Models;
 
 namespace NTRST.Spotify.Http;
 
 public class AuthenticationClient(
     ILogger<AuthenticationClient> logger,
     IOptions<SsoConfiguration> config,
-    HttpClient client)
+    HttpClient client,
+    TokenRetrivalService tokenRetrivalService)
 {
-    public async Task<ResponseTokenAuth> GetToken(string code, string redirectUri)
+
+
+    public async Task<Me> GetMe()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "v1/me");
+        request.Headers.Add("Authorization","Bearer "+ tokenRetrivalService.GetToken());
+        var response = await client.SendAsync(request);
+        if(!response.IsSuccessStatusCode) throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode);
+        var res = await response.Content.ReadFromJsonAsync<Me>();
+        return res;
+
+    }
+    public async Task<AuthenticationToken> GetToken(string code, string redirectUri)
     {
         try
         {
@@ -27,8 +42,6 @@ public class AuthenticationClient(
                 new("client_id", "client_id"),
                 new("client_secret", "client_secret")
             });
-            //formContent.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-
             var request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
             request.Content = formContent;
 
@@ -39,7 +52,7 @@ public class AuthenticationClient(
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<ResponseTokenAuth>();
+                return await response.Content.ReadFromJsonAsync<AuthenticationToken>();
             }
             
             throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode + " for token retrival");

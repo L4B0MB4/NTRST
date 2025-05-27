@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\NTRST.DB\NTRST.DB.csproj" />
         <ProjectReference Include="..\NTRST.Models\NTRST.Models.csproj"/>
     </ItemGroup>
 

@@ -1,3 +1,4 @@
+using NTRST.DB.Authentication;
 using NTRST.Models;
 using NTRST.Models.Config;
 using NTRST.Spotify.Extensions;
@@ -13,7 +14,9 @@ builder.Services.Configure<SsoConfiguration>(builder.Configuration.GetSection("s
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddCors();
+builder.Services.AddSpotifyServices();
 builder.Services.AddSpotifyHttpClient();
+builder.Services.AddAuthDbContext();
 
 
 var app = builder.Build();
@@ -35,5 +38,7 @@ app.UseCors(x =>
 });
 
 app.MapControllers();
+
+app.MigrateAuthDatabase();
 
 app.Run();

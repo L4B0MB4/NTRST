@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTRST.Models", "NTRST.Model
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTRST.Spotify", "NTRST.Spotify\NTRST.Spotify.csproj", "{C0749BDF-D794-4F6A-87F8-B868509B4911}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTRST.DB", "NTRST.DB\NTRST.DB.csproj", "{2DA38A4A-2BC3-4CEC-90D0-7497898FF40C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{C0749BDF-D794-4F6A-87F8-B868509B4911}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0749BDF-D794-4F6A-87F8-B868509B4911}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0749BDF-D794-4F6A-87F8-B868509B4911}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DA38A4A-2BC3-4CEC-90D0-7497898FF40C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA38A4A-2BC3-4CEC-90D0-7497898FF40C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA38A4A-2BC3-4CEC-90D0-7497898FF40C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA38A4A-2BC3-4CEC-90D0-7497898FF40C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

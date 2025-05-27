@@ -1,25 +1,26 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NTRST.Models;
+using NTRST.Models.Authentication;
+using NTRST.Models.Authentication.Internal;
 using NTRST.Models.Config;
-using NTRST.Models.SSO;
+using NTRST.Spotify;
 using NTRST.Spotify.Http;
 
-namespace NTRST.SSO;
+namespace NTRST.Authentication;
 
 [ApiController]
-[Route("/sso/spotify")]
-public class SpotifySSO(
-    ILogger<SpotifySSO> logger,
+[Route("/authentication/spotify")]
+public class SpotifyAuthentication(
+    ILogger<SpotifyAuthentication> logger,
     IOptions<SsoConfiguration> ssoConfigOption,
-    AuthenticationClient spotifyAuthClient) : ControllerBase
+    UserService userService) : ControllerBase
 {
     private string GetRedirectUrl()
     {
         var ssoConfig = ssoConfigOption.Value;
 
-        return new Uri(new Uri(ssoConfig.BaseUrl), "/sso/spotify/callback").ToString();
+        return new Uri(new Uri(ssoConfig.BaseUrl), "/authentication/spotify/callback").ToString();
     }
 
     [HttpGet("authorize")]
@@ -51,12 +52,12 @@ public class SpotifySSO(
     }
 
     [HttpGet("callback")]
-    public async Task<ActionResult> Callback([FromQuery] ResponseCodeAuth? responseCodeAuth)
+    public async Task<ActionResult> Callback([FromQuery] OAuthCodeResponse? responseCodeAuth)
     {
         if (responseCodeAuth?.Code == null) return new BadRequestResult();
         
-        var resp =await spotifyAuthClient.GetToken(responseCodeAuth.Code,GetRedirectUrl());
-        logger.LogInformation(JsonSerializer.Serialize(resp));
-        return new OkResult();
+        await userService.Authenticate(responseCodeAuth,GetRedirectUrl());
+
+        return new RedirectResult("/scalar");
     }
 }

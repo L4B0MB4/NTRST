@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NTRST.DB.Migrations
+namespace NTRST.DB.Auth.Migrations
 {
     /// <inheritdoc />
     public partial class AuthenticationInitialization : Migration
@@ -11,8 +11,12 @@ namespace NTRST.DB.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "auth");
+
             migrationBuilder.CreateTable(
                 name: "Tokens",
+                schema: "auth",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
@@ -31,6 +35,7 @@ namespace NTRST.DB.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Users",
+                schema: "auth",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -43,6 +48,7 @@ namespace NTRST.DB.Migrations
                     table.ForeignKey(
                         name: "FK_Users_Tokens_SpotifyTokenId",
                         column: x => x.SpotifyTokenId,
+                        principalSchema: "auth",
                         principalTable: "Tokens",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -50,6 +56,7 @@ namespace NTRST.DB.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_SpotifyTokenId",
+                schema: "auth",
                 table: "Users",
                 column: "SpotifyTokenId");
         }
@@ -58,10 +65,12 @@ namespace NTRST.DB.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Users",
+                schema: "auth");
 
             migrationBuilder.DropTable(
-                name: "Tokens");
+                name: "Tokens",
+                schema: "auth");
         }
     }
 }

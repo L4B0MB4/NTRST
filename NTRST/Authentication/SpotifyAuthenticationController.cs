@@ -6,15 +6,19 @@ using NTRST.Models.Authentication.Internal;
 using NTRST.Models.Config;
 using NTRST.Spotify;
 using NTRST.Spotify.Http;
+using NTRST.Spotify.Services;
 
 namespace NTRST.Authentication;
 
 [ApiController]
 [Route("/authentication/spotify")]
-public class SpotifyAuthentication(
-    ILogger<SpotifyAuthentication> logger,
+public class SpotifyAuthenticationController(
+    ILogger<SpotifyAuthenticationController> logger,
     IOptions<SsoConfiguration> ssoConfigOption,
-    UserService userService) : ControllerBase
+    UserService userService,
+    AuthenticationClient spotifyAuthClient,
+    IdentityService identityService
+) : ControllerBase
 {
     private string GetRedirectUrl()
     {
@@ -55,9 +59,19 @@ public class SpotifyAuthentication(
     public async Task<ActionResult> Callback([FromQuery] OAuthCodeResponse? responseCodeAuth)
     {
         if (responseCodeAuth?.Code == null) return new BadRequestResult();
+        var resp = await spotifyAuthClient.GetToken(responseCodeAuth.Code, GetRedirectUrl());
+        identityService.SetIdentity(resp, Guid.Empty);
+        var user = await userService.SaveUser(resp);
         
-        await userService.Authenticate(responseCodeAuth,GetRedirectUrl());
-
+        CookieOptions options = new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        };
+        //not rotatable but fine for now
+        Response.Cookies.Append("RefreshToken", user.Id.ToString(), options);
         return new RedirectResult("/scalar");
     }
 }

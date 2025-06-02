@@ -7,11 +7,13 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.*"/>
-        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.5.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.5.*"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.11.*" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NTRST.DB\NTRST.DB.csproj" />
+        <ProjectReference Include="..\NTRST.DB.Auth\NTRST.DB.Auth.csproj" />
+        <ProjectReference Include="..\NTRST.DB.Tracks\NTRST.DB.Tracks.csproj" />
         <ProjectReference Include="..\NTRST.Models\NTRST.Models.csproj"/>
     </ItemGroup>
 

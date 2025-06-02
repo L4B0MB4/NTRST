@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NTRST.DB.Authentication;
+using NTRST.DB.Auth.Authentication;
 using NTRST.Models.Authentication;
 using NTRST.Models.Authentication.Internal;
 using NTRST.Spotify.Http;
 
-namespace NTRST.Spotify;
+namespace NTRST.Spotify.Services;
 
 public class UserService(ILogger<UserService> logger,  MeClient meClient,AuthDbContext authDbContext)
 {
     
-    public async Task SaveUser(AuthenticationToken token)
+    public async Task<User> SaveUser(AuthenticationToken token)
     {
         
         var me = await meClient.GetMe();
@@ -35,7 +35,13 @@ public class UserService(ILogger<UserService> logger,  MeClient meClient,AuthDbC
             authDbContext.Add(user);
             await authDbContext.SaveChangesAsync();
         }
-        
-        var _me = await meClient.GetMe();
+
+        return user;
+    }
+
+    public async Task<User> GetUser(Guid userGuid)
+    {
+        var user = await authDbContext.Users.Include(x=>x.SpotifyToken).FirstOrDefaultAsync(x=>x.Id == userGuid);
+        return user;
     }
 }

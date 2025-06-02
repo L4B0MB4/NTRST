@@ -6,6 +6,7 @@ using NTRST.Models.Authentication.Internal;
 using NTRST.Models.Config;
 using NTRST.Spotify;
 using NTRST.Spotify.Http;
+using NTRST.Spotify.Services;
 
 namespace NTRST.Authentication;
 
@@ -16,7 +17,7 @@ public class SpotifyAuthenticationController(
     IOptions<SsoConfiguration> ssoConfigOption,
     UserService userService,
     AuthenticationClient spotifyAuthClient,
-    TokenRetrivalService tokenRetrivalService
+    IdentityService identityService
 ) : ControllerBase
 {
     private string GetRedirectUrl()
@@ -59,9 +60,18 @@ public class SpotifyAuthenticationController(
     {
         if (responseCodeAuth?.Code == null) return new BadRequestResult();
         var resp = await spotifyAuthClient.GetToken(responseCodeAuth.Code, GetRedirectUrl());
-        tokenRetrivalService.Token = resp;
-        await userService.SaveUser(resp);
-
+        identityService.SetIdentity(resp, Guid.Empty);
+        var user = await userService.SaveUser(resp);
+        
+        CookieOptions options = new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        };
+        //not rotatable but fine for now
+        Response.Cookies.Append("RefreshToken", user.Id.ToString(), options);
         return new RedirectResult("/scalar");
     }
 }

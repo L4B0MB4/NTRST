@@ -1,4 +1,4 @@
-using NTRST.DB.Authentication;
+using NTRST.DB.Auth.Authentication;
 using NTRST.Models;
 using NTRST.Models.Config;
 using NTRST.Spotify.Extensions;
@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.Configure<SsoConfiguration>(builder.Configuration.GetSection("sso"));
+builder.Services.Configure<AuthConfiguration>(builder.Configuration.GetSection("auth"));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -17,6 +18,7 @@ builder.Services.AddCors();
 builder.Services.AddSpotifyServices();
 builder.Services.AddSpotifyHttpClient();
 builder.Services.AddAuthDbContext();
+builder.Services.AddTracksDbContext();
 
 
 var app = builder.Build();
@@ -40,5 +42,6 @@ app.UseCors(x =>
 app.MapControllers();
 
 app.MigrateAuthDatabase();
+app.MigrateTracksDatabase();
 
 app.Run();

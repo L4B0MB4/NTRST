@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NTRST.Models.Authentication;
 using NTRST.Models.Authentication.Internal;
 
-namespace NTRST.DB.Authentication;
+namespace NTRST.DB.Auth.Authentication;
 
 public class AuthDbContext : DbContext
 {
@@ -26,6 +26,7 @@ public class AuthDbContext : DbContext
         => options.UseSqlite($"Data Source={DbPath}");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("auth");
         // Automatically apply all IEntityTypeConfiguration<> from another assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthenticationToken).Assembly);
     }

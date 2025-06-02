@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace NTRST.DB.Authentication;
+namespace NTRST.DB.Auth.Authentication;
 
 public static class Extensions
 {

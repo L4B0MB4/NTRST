@@ -7,4 +7,5 @@ public class Track
     public string ExternalId { get; set; }
     public string ExternalArtistId { get; set; }
     public string[] Genres { get; set; }
+    public string Source { get; set; }
 }

@@ -1,14 +1,25 @@
 using Microsoft.Extensions.Logging;
-using NTRST.DB.Authentication;
+using NTRST.DB.Auth.Authentication;
 using NTRST.Models.Authentication.Internal;
 using NTRST.Models.Exceptions;
+using NTRST.Spotify.Http;
 
-namespace NTRST.Spotify.Http;
+namespace NTRST.Spotify.Services;
 
-public class TokenRetrivalService(ILogger<TokenRetrivalService> logger, AuthenticationClient authenticationClient, AuthDbContext authDbContext)
+public class IdentityService(ILogger<IdentityService> logger, AuthenticationClient authenticationClient, AuthDbContext authDbContext)
 {
-    public AuthenticationToken? Token { get; set; }
+    
+    
+    public Guid UserId { get; private set; }
+    public AuthenticationToken? Token { get; private set; }
 
+    public void SetIdentity(AuthenticationToken token, Guid userId)
+    {
+        Token = token;
+        UserId = userId;
+    }
+    
+    
     public async Task<string?> GetToken()
     {
         if (Token == null)

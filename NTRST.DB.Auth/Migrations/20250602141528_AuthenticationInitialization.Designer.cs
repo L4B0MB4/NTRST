@@ -4,21 +4,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NTRST.DB.Authentication;
+using NTRST.DB.Auth.Authentication;
 
 #nullable disable
 
-namespace NTRST.DB.Migrations
+namespace NTRST.DB.Auth.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250527204423_AuthenticationInitialization")]
+    [Migration("20250602141528_AuthenticationInitialization")]
     partial class AuthenticationInitialization
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
+            modelBuilder
+                .HasDefaultSchema("auth")
+                .HasAnnotation("ProductVersion", "9.0.5");
 
             modelBuilder.Entity("NTRST.Models.Authentication.Internal.AuthenticationToken", b =>
                 {
@@ -51,7 +53,7 @@ namespace NTRST.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tokens");
+                    b.ToTable("Tokens", "auth");
                 });
 
             modelBuilder.Entity("NTRST.Models.Authentication.User", b =>
@@ -71,7 +73,7 @@ namespace NTRST.DB.Migrations
 
                     b.HasIndex("SpotifyTokenId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", "auth");
                 });
 
             modelBuilder.Entity("NTRST.Models.Authentication.User", b =>

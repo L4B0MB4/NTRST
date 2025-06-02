@@ -11,8 +11,8 @@ using NTRST.DB.Tracks;
 namespace NTRST.DB.Tracks.Migrations
 {
     [DbContext(typeof(TracksDbContext))]
-    [Migration("20250602152335_AddScopeToTracks")]
-    partial class AddScopeToTracks
+    [Migration("20250602180958_AuthenticationInitialization")]
+    partial class AuthenticationInitialization
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,27 +30,24 @@ namespace NTRST.DB.Tracks.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TrackArtist")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TrackName")
+                    b.Property<string>("TrackCalculatedId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("PlayedAt", "UserId");
 
-                    b.HasIndex("TrackName", "TrackArtist");
+                    b.HasIndex("TrackCalculatedId");
 
                     b.ToTable("RecentlyPlayed", "tracks");
                 });
 
             modelBuilder.Entity("NTRST.Models.Tracks.Track", b =>
                 {
-                    b.Property<string>("Name")
+                    b.Property<string>("CalculatedId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Artist")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalArtistId")
@@ -65,11 +62,15 @@ namespace NTRST.DB.Tracks.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Name", "Artist");
+                    b.HasKey("CalculatedId");
 
                     b.ToTable("Tracks", "tracks");
                 });
@@ -78,7 +79,7 @@ namespace NTRST.DB.Tracks.Migrations
                 {
                     b.HasOne("NTRST.Models.Tracks.Track", "Track")
                         .WithMany()
-                        .HasForeignKey("TrackName", "TrackArtist")
+                        .HasForeignKey("TrackCalculatedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -19,15 +19,17 @@ namespace NTRST.DB.Tracks.Migrations
                 schema: "tracks",
                 columns: table => new
                 {
+                    CalculatedId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Artist = table.Column<string>(type: "TEXT", nullable: false),
                     ExternalId = table.Column<string>(type: "TEXT", nullable: false),
                     ExternalArtistId = table.Column<string>(type: "TEXT", nullable: false),
-                    Genres = table.Column<string>(type: "TEXT", nullable: false)
+                    Genres = table.Column<string>(type: "TEXT", nullable: false),
+                    Source = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tracks", x => new { x.Name, x.Artist });
+                    table.PrimaryKey("PK_Tracks", x => x.CalculatedId);
                 });
 
             migrationBuilder.CreateTable(
@@ -37,26 +39,25 @@ namespace NTRST.DB.Tracks.Migrations
                 {
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PlayedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TrackName = table.Column<string>(type: "TEXT", nullable: false),
-                    TrackArtist = table.Column<string>(type: "TEXT", nullable: false)
+                    TrackCalculatedId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RecentlyPlayed", x => new { x.PlayedAt, x.UserId });
                     table.ForeignKey(
-                        name: "FK_RecentlyPlayed_Tracks_TrackName_TrackArtist",
-                        columns: x => new { x.TrackName, x.TrackArtist },
+                        name: "FK_RecentlyPlayed_Tracks_TrackCalculatedId",
+                        column: x => x.TrackCalculatedId,
                         principalSchema: "tracks",
                         principalTable: "Tracks",
-                        principalColumns: new[] { "Name", "Artist" },
+                        principalColumn: "CalculatedId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecentlyPlayed_TrackName_TrackArtist",
+                name: "IX_RecentlyPlayed_TrackCalculatedId",
                 schema: "tracks",
                 table: "RecentlyPlayed",
-                columns: new[] { "TrackName", "TrackArtist" });
+                column: "TrackCalculatedId");
         }
 
         /// <inheritdoc />

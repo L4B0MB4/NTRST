@@ -7,20 +7,19 @@ using NTRST.Spotify.Http;
 
 namespace NTRST.Spotify;
 
-public class UserService(ILogger<UserService> logger, AuthenticationClient spotifyAuthClient, TokenRetrivalService tokenRetrivalService,AuthDbContext authDbContext)
+public class UserService(ILogger<UserService> logger,  MeClient meClient,AuthDbContext authDbContext)
 {
     
-    public async Task Authenticate(OAuthCodeResponse responseCodeAuth,string redirectUrl)
+    public async Task SaveUser(AuthenticationToken token)
     {
-        var resp =await spotifyAuthClient.GetToken(responseCodeAuth.Code,redirectUrl);
-        tokenRetrivalService.Token = resp;
-        var me = await spotifyAuthClient.GetMe();
+        
+        var me = await meClient.GetMe();
         //needs change once there are more authentication methods
         var user = await authDbContext.Users.Include(x=>x.SpotifyToken).FirstOrDefaultAsync(x=>x.ExternalId == me.Id);
         if (user != null)
         {
             var currentToken = user.SpotifyToken;
-            user.SpotifyToken = resp;
+            user.SpotifyToken = token;
             authDbContext.Update(user);
             authDbContext.Remove(currentToken);
             await authDbContext.SaveChangesAsync();
@@ -31,12 +30,12 @@ public class UserService(ILogger<UserService> logger, AuthenticationClient spoti
             {
                 Id = Guid.NewGuid(),
                 ExternalId = me.Id,
-                SpotifyToken = resp
+                SpotifyToken = token
             };
             authDbContext.Add(user);
             await authDbContext.SaveChangesAsync();
         }
-
-        var res = await spotifyAuthClient.GetRecentlyPlayed();
+        
+        var _me = await meClient.GetMe();
     }
 }

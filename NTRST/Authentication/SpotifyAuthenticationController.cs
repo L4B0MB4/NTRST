@@ -14,7 +14,10 @@ namespace NTRST.Authentication;
 public class SpotifyAuthenticationController(
     ILogger<SpotifyAuthenticationController> logger,
     IOptions<SsoConfiguration> ssoConfigOption,
-    UserService userService) : ControllerBase
+    UserService userService,
+    AuthenticationClient spotifyAuthClient,
+    TokenRetrivalService tokenRetrivalService
+) : ControllerBase
 {
     private string GetRedirectUrl()
     {
@@ -55,8 +58,9 @@ public class SpotifyAuthenticationController(
     public async Task<ActionResult> Callback([FromQuery] OAuthCodeResponse? responseCodeAuth)
     {
         if (responseCodeAuth?.Code == null) return new BadRequestResult();
-        
-        await userService.Authenticate(responseCodeAuth,GetRedirectUrl());
+        var resp = await spotifyAuthClient.GetToken(responseCodeAuth.Code, GetRedirectUrl());
+        tokenRetrivalService.Token = resp;
+        await userService.SaveUser(resp);
 
         return new RedirectResult("/scalar");
     }

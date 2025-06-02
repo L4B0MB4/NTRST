@@ -15,8 +15,10 @@ public class AuthenticationToken
     [JsonIgnore]
     public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
     public bool IsExpired => DateTime.UtcNow > IssuedAt.AddSeconds(ExpiresIn-100);
+    
+    //will not be part of refresh response
     [JsonPropertyName("refresh_token")]
-    public required string? RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 }

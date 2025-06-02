@@ -12,6 +12,14 @@ public static class HttpClientExtensions
         {
             client.BaseAddress = new Uri("https://api.spotify.com");
         }).AddStandardResilienceHandler();
+        services.AddHttpClient<MeClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.spotify.com");
+        }).AddStandardResilienceHandler();
+        /*services.AddHttpClient<TrackClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.spotify.com");
+        }).AddStandardResilienceHandler();*/
         return services;
     }
 }

@@ -13,31 +13,8 @@ namespace NTRST.Spotify.Http;
 public class AuthenticationClient(
     ILogger<AuthenticationClient> logger,
     IOptions<SsoConfiguration> config,
-    HttpClient client,
-    TokenRetrivalService tokenRetrivalService)
+    HttpClient client)
 {
-
-
-    public async Task<IEnumerable<PlaybackHistoryItem>> GetRecentlyPlayed()
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, "v1/me/player/recently-played?limit=50");
-        request.Headers.Add("Authorization","Bearer "+ tokenRetrivalService.GetToken());
-        var response = await client.SendAsync(request);
-        if(!response.IsSuccessStatusCode) throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode);
-        var res = await response.Content.ReadFromJsonAsync<PlaybackHistoryResponse>();
-        return res.Items;
-    }
-    
-    public async Task<Me> GetMe()
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, "v1/me");
-        request.Headers.Add("Authorization","Bearer "+ tokenRetrivalService.GetToken());
-        var response = await client.SendAsync(request);
-        if(!response.IsSuccessStatusCode) throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode);
-        var res = await response.Content.ReadFromJsonAsync<Me>();
-        return res;
-
-    }
     public async Task<AuthenticationToken> GetToken(string code, string redirectUri)
     {
         try
@@ -48,9 +25,7 @@ public class AuthenticationClient(
             {
                 new("grant_type", "authorization_code"),
                 new("code", code),
-                new("redirect_uri", redirectUri),
-                new("client_id", "client_id"),
-                new("client_secret", "client_secret")
+                new("redirect_uri", redirectUri)
             });
             var request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
             request.Content = formContent;
@@ -64,14 +39,47 @@ public class AuthenticationClient(
             {
                 return await response.Content.ReadFromJsonAsync<AuthenticationToken>();
             }
-            
-            throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode + " for token retrival");
+
+            throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode +
+                                                  " for token retrival");
         }
         catch (Exception e)
         {
-            logger.LogError("Exception during token retrival {e}",e);
+            logger.LogError("Exception during token retrival {e}", e);
             throw;
         }
+    }
 
+    public async Task<AuthenticationToken> RefreshToken(string? refreshToken)
+    {
+        var spotifyConfig = config.Value.Spotify;
+        if (spotifyConfig == null) throw new ArgumentNullException(nameof(spotifyConfig));
+        try
+        {
+            var formContent = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
+            {
+                new("grant_type", "refresh_token"),
+                new("refresh_token", refreshToken)
+            });
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
+            request.Content = formContent;
+            request.Headers.Add("Authorization",
+                "Basic " + Convert.ToBase64String(
+                    Encoding.UTF8.GetBytes($"{spotifyConfig.ClientId}:{spotifyConfig.ClientSecret}")));
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<AuthenticationToken>();
+            }
+
+            throw new UnauthorizedAccessException("Unsuccessful response: " + response.StatusCode +
+                                                  " for token retrival");
+        }
+        catch (Exception e)
+        {
+            logger.LogError("Exception during token retrival {e}", e);
+            throw;
+        }
     }
 }
